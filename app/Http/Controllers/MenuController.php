@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
 use Illuminate\Routing\Controller as BaseController;
-
+use Illuminate\Support\Facades\DB;
 class MenuController extends BaseController
 {
     /* TODO: complete getMenuItems so that it returns a nested menu structure from the database
@@ -93,6 +93,51 @@ class MenuController extends BaseController
      */
 
     public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+        $menu_items =  MenuItem::all();
+        $data = [];
+        $k = 0;
+        foreach($menu_items as $value){
+           $children = [];
+           $i = 0; 
+           $menu_children = DB::table('menu_items')->where('parent_id', trim($value['id']))->get();
+           foreach($menu_children as $value1){
+            $children_1 = [];
+            $i_1 = 0; 
+            $menu_children_1 = DB::table('menu_items')->where('parent_id', trim($value['id']))->get();
+            foreach($menu_children_1 as $value2){              
+                $children_1[$i_1] = array(
+                'id'=>$value2->id,
+                'name'=>$value2->name,
+                'url' => $value2->url,
+                'parent_id' => $value2->parent_id,
+                'created_at'=>$value2->created_at,
+                'updated_at' => $value2->updated_at,
+                'children' => $children_1
+            );
+            $i_1++;
+            }
+               $children[$i] = array(
+                   'id'=>$value1->id,
+                   'name'=>$value1->name,
+                   'url' => $value1->url,
+                   'parent_id' => $value1->parent_id,
+                   'created_at'=>$value1->created_at,
+                   'updated_at' => $value1->updated_at,
+                   'children' => $children_1
+               );
+               $i++;
+           }
+           $data[$k] =  array(
+            'id'=>$value->id,
+            'name'=>$value->name,
+            'url' => $value->url,
+            'parent_id' => $value->parent_id,
+            'created_at'=>$value->created_at,
+            'updated_at' => $value->updated_at,
+            'children' => $children);
+           $k++;
+        }
+        echo "<pre>";
+        echo json_encode($data, JSON_PRETTY_PRINT);
     }
 }

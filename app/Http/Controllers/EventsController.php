@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Workshop;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -101,7 +103,35 @@ class EventsController extends BaseController
      */
 
     public function getEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 1');
+         $events =  Event::all();
+         $data = [];
+         $k = 0;
+         foreach($events as $key => $value){
+            $workshops = [];
+            $i = 0; 
+            $events_workshop = DB::table('workshops')->where('event_id', trim($value['id']))->get();
+            foreach($events_workshop as $key1 => $value1){
+                $workshops[$i] = array(
+                    'id'=>$value1->id,
+                    'start'=>$value1->start,
+                    'end'=>$value1->end,
+                    'event_id'=>$value->id,
+                    'name'=>$value1->name,
+                    'created_at'=>$value1->created_at,
+                    'updated_at' => $value1->updated_at
+                );
+                $i++;
+            }
+            $data[$k] =  array(
+                'id'=>$value['id'],
+                'name'=>$value['name'],
+                'created_at'=>$value['created_at'],
+                'updated_at'=>$value['updated_at'],
+                'workshops' => $workshops);
+            $k++;
+         }
+         echo "<pre>";
+         echo json_encode($data, JSON_PRETTY_PRINT);
     }
 
 
@@ -179,6 +209,38 @@ class EventsController extends BaseController
      */
 
     public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
+        $events =  Event::all();
+        $data = [];
+        $k = 0;
+        foreach($events as $key => $value){
+           $workshops = [];
+           $i = 0; 
+           $events_workshop = DB::table('workshops')->where('event_id', trim($value['id']))->get();
+           foreach($events_workshop as $key1 => $value1){
+            if(strtotime(date("Y-m-d H:i:s")) < strtotime($value1->start)){
+               $workshops[$i] = array(
+                   'id'=>$value1->id,
+                   'start'=>$value1->start,
+                   'end'=>$value1->end,
+                   'event_id'=>$value->id,
+                   'name'=>$value1->name,
+                   'created_at'=>$value1->created_at,
+                   'updated_at' => $value1->updated_at
+               );
+               $i++;
+            }
+           }
+           if($i>0){
+           $data[$k] =  array(
+               'id'=>$value['id'],
+               'name'=>$value['name'],
+               'created_at'=>$value['created_at'],
+               'updated_at'=>$value['updated_at'],
+               'workshops' => $workshops);
+           $k++;
+        }
+    }
+        echo "<pre>";
+        echo json_encode($data, JSON_PRETTY_PRINT);
     }
 }

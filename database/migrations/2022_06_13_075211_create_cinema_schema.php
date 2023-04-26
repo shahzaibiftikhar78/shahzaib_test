@@ -36,7 +36,37 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        //Movie exploration
+        Schema::create('movie_watched', function($table) { //As a user I want to see which films can be watched and at what times
+            $table->increments('id');
+            $table->string('name');
+            $table->string('watch_time');
+            $table->timestamps();
+        });
+        Schema::create('shows_not_booked', function($table) { //As a user I want to only see the shows which are not booked out
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        //**Show administration**
+        Schema::create('movie_to_be_run', function($table) { //This table can perform both tasks of Show administartion
+            $table->increments('id');
+            $table->string('name');
+            $table->string('movie_start_time');
+            $table->string('movie_showroom');
+            $table->timestamps();
+        });
+
+        // **Pricing**
+        Schema::create('pricing', function($table) { // This table can perform both tasks of Pricing
+            $table->increments('id');
+            $table->string('name');
+            $table->string('seat_type');
+            $table->float('per_show_payment');
+            $table->string('movie_showroom');
+            $table->timestamps();
+        });
     }
 
     /**
